@@ -7,8 +7,18 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from itertools import combinations_with_replacement
 
+# Helper recursive function that gets a list of all possible combinations with replacement allowed.
+def calculateCombinations(list, length):
+    # Base case:
+    if length == 0:
+        return [[]]
+    else:
+        result = []
+        for i in range(len(list)):
+            for c in calculateCombinations(list[i:], length - 1): # Conquer to get all combinations of smaller size.
+                result.append([list[i]] + c) # Combine to build up the combinations as required.
+        return result
 
 # Custom Classes:
 
@@ -28,7 +38,7 @@ class PolynomialFeaturesFromScratch:
         # This is done in a building up manner going through all degrees up to d
         for d in range(1, self.degree + 1):
             # Get all combinations of input features up to degree d
-            combinations = combinations_with_replacement(range(cols), d)
+            combinations = calculateCombinations(range(cols), d)
             for c in combinations:
                 # Create polynomial feature as a product of input features with given combination (c has the indices of the columns to be multiplied)
                 new_feature = np.prod(X[:, c], axis=1)
@@ -86,7 +96,7 @@ fifa_data = data.iloc[:, :]
 
 corr = fifa_data.corr()
 
-#Top 6.5% Correlation training features with the Value:
+#Top 50% Correlation training features with the Value:
 top_features = corr.index[abs(corr['Value'])>0.5]
 
 #Correlation plot
